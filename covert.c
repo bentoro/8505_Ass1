@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <stdbool.h>
 #include <time.h>
+#include "covert.h"
 
 static struct option long_options[] = {
         {"dest",    required_argument, 0, 'd'},
@@ -27,7 +28,7 @@ static struct option long_options[] = {
         {"client",  required_argument, 0, 'c'},
         {"tos",     required_argument, 0, 't'},
         {"test",    required_argument, 0, 'u'},
-        {"servertest", required_argument,0, 'y'},
+        {"stest",   required_argument, 0, 'y'},
         {0,         0,                 0,  0}
 };
 
@@ -187,13 +188,13 @@ int main(int argc, char **argv){
         server = false;
         client = true;
    } else if(servertest){
-        strcpy(dests, "192.168.1.24");
+        strcpy(dests, "192.168.1.23");
         dest = inet_addr(dests);
-        strcpy(srcs, "192.168.1.23");
+        strcpy(srcs, "192.168.1.24");
         src = inet_addr(srcs);
         strcpy(file, "secret");
-        sport = 80;
-        dport = 80;
+        sport = 7005;
+        dport = 7005;
         printf("seq: %d\n", seq);
         printf("ipid: %d\n", ipid);
         printf("tos: %d\n", tos);
@@ -282,7 +283,7 @@ int main(int argc, char **argv){
 #
 # RETURNS:    void
 #
-# NOTES:	  This receives covert packets
+# NOTES:		This receives covert packets
 #
 ------------------------------------------------------------------------------*/
 
@@ -486,7 +487,7 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
 #
 # DATE:		Sept 24, 2018
 #
-# DESIGNER:	    Craig H. Rowland
+# DESIGNER:	Craig H. Rowland
 # PROGRAMMER:	Craig H. Rowland
 #
 # PARAMETERS: unsigned short *ptr - pointer
