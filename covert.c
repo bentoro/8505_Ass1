@@ -78,16 +78,16 @@ bool client, server, ipid, seq, ack, tos;
 #
 # PROGRAM:  		COMP8505 - Assignment 1
 #
-# FUNCTIONS:  Main()
+# FUNCTIONS:  		Main()
 #
-# DATE:			  Sept 24, 2018
+# DATE:			 Sept 24, 2018
 #
 # DESIGNER:		Benedict Lo
-# PROGRAMMER:	Benedict Lo
+# PROGRAMMER:		Benedict Lo
 #
-# PARAMETERS: int argc, char *argv[]
+# PARAMETERS: 		int argc, char *argv[]
 #
-# RETURNS:    int
+# RETURNS:    		int
 #
 # NOTES:		This programs sends and receives covert packets with different encodings
 #
@@ -263,15 +263,15 @@ int main(int argc, char **argv){
     exit(0);
 }
 /*------------------------------------------------------------------------------
-# SOURCE FILE: 		covert.cpp
+# SOURCE FILE: 	covert.cpp
 #
-# PROGRAM:  		COMP8505 - Assignment 1
+# PROGRAM:  	COMP8505 - Assignment 1
 #
-# FUNCTIONS:  Main()
+# FUNCTIONS:  	RecvPacket()
 #
-# DATE:			  Sept 24, 2018
+# DATE:		Sept 24, 2018
 #
-# DESIGNER:		Benedict Lo
+# DESIGNER:	Benedict Lo
 # PROGRAMMER:	Benedict Lo
 #
 # PARAMETERS: unsigned int src - source ip
@@ -361,15 +361,15 @@ void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, ch
         fclose(output);
     }
 /*------------------------------------------------------------------------------
-# SOURCE FILE: 		covert.cpp
+# SOURCE FILE: 	covert.cpp
 #
-# PROGRAM:  		COMP8505 - Assignment 1
+# PROGRAM:  	COMP8505 - Assignment 1
 #
-# FUNCTIONS:  Main()
+# FUNCTIONS:    SendPacket()
 #
-# DATE:			  Sept 24, 2018
+# DATE:		Sept 24, 2018
 #
-# DESIGNER:		Benedict Lo
+# DESIGNER:	Benedict Lo
 # PROGRAMMER:	Benedict Lo
 #
 # PARAMETERS: unsigned int src - source ip
@@ -480,15 +480,15 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
     }
 
 /*------------------------------------------------------------------------------
-# SOURCE FILE: 		covert.cpp
+# SOURCE FILE: 	covert.cpp
 #
-# PROGRAM:  		COMP8505 - Assignment 1
+# PROGRAM:  	COMP8505 - Assignment 1
 #
-# FUNCTIONS:  Main()
+# FUNCTIONS:  in_cksum()
 #
-# DATE:			  Sept 24, 2018
+# DATE:		Sept 24, 2018
 #
-# DESIGNER:		Craig H. Rowland
+# DESIGNER:	Craig H. Rowland
 # PROGRAMMER:	Craig H. Rowland
 #
 # PARAMETERS: unsigned short *ptr - pointer
@@ -522,19 +522,19 @@ unsigned short in_cksum(unsigned short *ptr, int nbytes){
     return(answer);
 }
 /*------------------------------------------------------------------------------
-# SOURCE FILE: 		covert.cpp
+# SOURCE FILE: 	covert.cpp
 #
-# PROGRAM:  		COMP8505 - Assignment 1
+# PROGRAM:  	COMP8505 - Assignment 1
 #
-# FUNCTIONS:  CheckRoot()
+# FUNCTIONS:    CheckRoot()
 #
-# DATE:			  Sept 24, 2018
+# DATE:		Sept 24, 2018
 #
-# DESIGNER:		Benedict Lo
+# DESIGNER:	Benedict Lo
 # PROGRAMMER:	Benedict Lo
 #
 #
-# RETURNS:    Void
+# RETURNS:   	 Void
 #
 # NOTES:		Checks if the user is root
 #
