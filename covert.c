@@ -181,7 +181,6 @@ int main(int argc, char **argv){
         strcpy(file, "secret");
         sport = 7005;
         dport = 7005;
-        tos = true;
         printf("seq: %d\n",seq);
         printf("ipid: %d\n", ipid);
         printf("tos: %d\n", tos);
@@ -195,7 +194,6 @@ int main(int argc, char **argv){
         strcpy(file, "secret");
         sport = 7005;
         dport = 7005;
-        tos = true;
         printf("seq: %d\n", seq);
         printf("ipid: %d\n", ipid);
         printf("tos: %d\n", tos);
