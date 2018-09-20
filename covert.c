@@ -25,7 +25,8 @@ static struct option long_options[] = {
         {"seq",     required_argument, 0, 'q'},
         {"ack",     required_argument, 0, 'a'},
         {"client",  required_argument, 0, 'c'},
-        {"test",    required_argument, 0, 't'},
+        {"tos",     required_argument, 0, 't'},
+        {"test",    required_argument, 0, 'u'},
         {"servertest", required_argument,0, 'y'},
         {0,         0,                 0,  0}
 };
@@ -42,9 +43,10 @@ static struct option long_options[] = {
                     "\t[i]pid                     - encoding using sequence number\n"\
                     "\tse[q]uence number          - encoding using sequence number\n"\
                     "\t[a]cknowledgement number   - encoding using ackowlegement number, 1 if chosen\n"\
+                    "\t[t]ype of service          - encoding using type of service \n"\
                     "");\
    }while(0)
-
+//
     struct send_header{
         struct iphdr ip;
         struct tcphdr tcp;
@@ -68,25 +70,45 @@ static struct option long_options[] = {
 void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsigned short dport, char *filename, int ipid, int seq, int ack);
 void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, char *filename, int ipied, int seq, int ack);
 unsigned short in_cksum(unsigned short *, int);
+void CheckRoot();
 
-bool client, server, ipid, seq, ack;
-
+bool client, server, ipid, seq, ack, tos;
+/*------------------------------------------------------------------------------
+# SOURCE FILE: 		covert.cpp
+#
+# PROGRAM:  		COMP8505 - Assignment 1
+#
+# FUNCTIONS:  Main()
+#
+# DATE:			  Sept 24, 2018
+#
+# DESIGNER:		Benedict Lo
+# PROGRAMMER:	Benedict Lo
+#
+# PARAMETERS: int argc, char *argv[]
+#
+# RETURNS:    int
+#
+# NOTES:		This programs sends and receives covert packets with different encodings
+#
+------------------------------------------------------------------------------*/
 int main(int argc, char **argv){
 
     time_t t;
     int c;
     char dests[80], srcs[80], file[80];
-    bool test,stest;
+    bool clienttest,servertest;
     unsigned int dest, src;
     unsigned short sport, dport;
     server = true;
     client = false;
 
+    //initilize random generator
     srand((unsigned) time(&t));
 
    while(1){
     int option_index = 0;
-    c = getopt_long (argc, argv, "t:y:i:q:a", long_options, &option_index);
+    c = getopt_long (argc, argv, "u:y:i:q:a", long_options, &option_index);
     if (c == -1){
         break;
     }
@@ -130,11 +152,15 @@ int main(int argc, char **argv){
                 server = false;
                 printf("client: true\n");
             break;
-        case 't':
-            test = true;
+        case 'u':
+            clienttest = true;
             break;
         case 'y':
-            stest = true;
+            servertest = true;
+            break;
+        case 't':
+            tos = true;
+            printf("Encoding: Type of Service\n");
             break;
         case '?':
 
@@ -144,15 +170,10 @@ int main(int argc, char **argv){
     }
    }
 
-   //check if the user has root privilages
-   //check for encoding type
-   //check for file
    //check if server or client
-   if(geteuid() !=0){
-        printf("User must be root to run this program\n");
-        exit(0);
-   }
-   if(test) {
+   CheckRoot();
+
+   if(clienttest) {
         strcpy(dests, "127.0.0.1");
         dest = inet_addr(dests);
         strcpy(srcs, "127.0.0.1");
@@ -160,10 +181,13 @@ int main(int argc, char **argv){
         strcpy(file, "secret");
         sport = 7005;
         dport = 7005;
-        seq = true;
+        tos = true;
+        printf("seq: %d\n",seq);
+        printf("ipid: %d\n", ipid);
+        printf("tos: %d\n", tos);
         server = false;
         client = true;
-   } else if(stest){
+   } else if(servertest){
         strcpy(dests, "127.0.0.1");
         dest = inet_addr(dests);
         strcpy(srcs, "127.0.0.1");
@@ -171,7 +195,10 @@ int main(int argc, char **argv){
         strcpy(file, "secret");
         sport = 7005;
         dport = 7005;
-        seq = true;
+        tos = true;
+        printf("seq: %d\n", seq);
+        printf("ipid: %d\n", ipid);
+        printf("tos: %d\n", tos);
         server = true;
         client = false;
    } else {
@@ -187,6 +214,11 @@ int main(int argc, char **argv){
    }
 
     if(client){
+        if(ack == 1){
+            printf("Ack encoding mode can only be used for server");
+            print_usage();
+            exit(0);
+        }
         if(dest == 0){
             printf("Please select a destination address");
             print_usage();
@@ -220,29 +252,53 @@ int main(int argc, char **argv){
             printf("\nServer Mode: Listening for data \n\n");
     }
    }
-   //check if there is a file
-   //check if server or client
-    if(client){
+    //if client send packet
+   if(client){
     SendPacket(src, dest, sport, dport, file, ipid, seq, ack);
     } else {
+    //if server receive packet
     RecvPacket(src, sport, dport, file, ipid, seq, ack);
     }
 
     exit(0);
 }
+/*------------------------------------------------------------------------------
+# SOURCE FILE: 		covert.cpp
+#
+# PROGRAM:  		COMP8505 - Assignment 1
+#
+# FUNCTIONS:  Main()
+#
+# DATE:			  Sept 24, 2018
+#
+# DESIGNER:		Benedict Lo
+# PROGRAMMER:	Benedict Lo
+#
+# PARAMETERS: unsigned int src - source ip
+              unsigned short sport - source port
+              unsigned short dport - destionation port
+              char *filename - filename
+              int ipid - ipid encoding
+              int seq - sequence encoding
+              int ack - ack encoding
+#
+# RETURNS:    void
+#
+# NOTES:		This receives covert packets
+#
+------------------------------------------------------------------------------*/
 
 void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, char *filename, int ipid, int seq, int ack){
 
-    //if server open file and read it
     int recv_fd;
     FILE *output;
 
-    srand((getpid())*(dport));
-
+        //open file in write binary
         if((output=fopen(filename,"wb"))==NULL){
             printf("Cannot open %s for writing\n", filename);
             exit(1);
         }
+        //keep reading packets
         while(1){
             recv_fd = socket(AF_INET, SOCK_RAW, 6);
             if(recv_fd < 0){
@@ -266,9 +322,14 @@ void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, ch
                         fprintf(output, "%c", recv_header.tcp.seq);
                         fflush(output);
                     } else if(ack==1){
-                        //decoding ack numbers
+                        //for bouncing of a packet to work a server must be listening for data on a predetermined port in which the port should be forged to
+                        //depending on the status of the port the "bounce server" may either send a syn/ack or a syn/rst
                         printf("Receiving Data: %c\n", recv_header.tcp.ack_seq);
                         fprintf(output, "%c", recv_header.tcp.ack_seq);
+                        fflush(output);
+                    } else if(tos==1){
+                        printf("Receiving Data: %c\n", recv_header.ip.tos);
+                        fprintf(output, "%c", recv_header.ip.tos);
                         fflush(output);
                     }
                 }
@@ -286,6 +347,10 @@ void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, ch
                         printf("Receiving Data: %c\n", recv_header.tcp.ack_seq);
                         fprintf(output,"%c", recv_header.tcp.ack_seq);
                         fflush(output);
+                    } else if(tos==1){
+                        printf("Receiving Data: %c\n", recv_header.ip.tos);
+                        fprintf(output, "%c", recv_header.ip.tos);
+                        fflush(output);
                     }
                 }
             }
@@ -295,16 +360,38 @@ void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, ch
         //close file
         fclose(output);
     }
-
+/*------------------------------------------------------------------------------
+# SOURCE FILE: 		covert.cpp
+#
+# PROGRAM:  		COMP8505 - Assignment 1
+#
+# FUNCTIONS:  Main()
+#
+# DATE:			  Sept 24, 2018
+#
+# DESIGNER:		Benedict Lo
+# PROGRAMMER:	Benedict Lo
+#
+# PARAMETERS: unsigned int src - source ip
+              unsigned int dst - destination ip
+              unsigned short sport - source port
+              unsigned short dport - destination port
+              char *filename - name of file
+              int ipid - ipid encoding
+              int seq - sequence number encoding
+              int ack - ack number encoding
+#
+# RETURNS:    void
+#
+# NOTES:		Sends a covert packet to the destination
+#
+------------------------------------------------------------------------------*/
 void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsigned short dport, char *filename, int ipid, int seq, int ack){
 
-    //if server open file and read it
     int ch;
     int send_fd;
     struct sockaddr_in sin;
     FILE *input;
-
-    srand((getpid())*(dport));
 
         if((input=fopen(filename, "rb"))== NULL){
             printf("File: %s could not be opened \n", filename);
@@ -312,18 +399,17 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
         while((ch=fgetc(input)) != EOF){
 
             //without sleep the characters are read in the wrong order
+            //characters aresent too quickly for the server
             sleep(1);
 
-           //IP HEADER
-           //VERSION | IHL | TOS | TOTAL LENGTH
-           //IDENTIFICATION | FLAGS | FRAGMENT OFFSET
-           //TTL | PROTOCOL | HEADER CHECKSUM
-           //SOURCE ADDRESS
-           //DESTINATION ADDRESS
-           //OPTIONS
+            //fill ip header
            send_header.ip.ihl = 5;
            send_header.ip.version = 4;
-           send_header.ip.tos = 0;
+           if(tos==0){
+                send_header.ip.tos = 0;
+           } else {
+                send_header.ip.tos = ch;
+           }
            send_header.ip.tot_len = htons(40);
            if(ipid == 0){
                 send_header.ip.id = (int)(255.0*rand()/(RAND_MAX+1.0));
@@ -336,7 +422,8 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
            send_header.ip.check = 0;
            send_header.ip.saddr = src;
            send_header.ip.daddr = dst;
-           // change host byte order to network byte order
+
+           //fill tcp header
            send_header.tcp.source = htons(sport);
            if(seq == 0){
                 send_header.tcp.seq = 1+(int)(10000.0*rand()/(RAND_MAX+1.0));
@@ -392,7 +479,26 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
         }
     }
 
-
+/*------------------------------------------------------------------------------
+# SOURCE FILE: 		covert.cpp
+#
+# PROGRAM:  		COMP8505 - Assignment 1
+#
+# FUNCTIONS:  Main()
+#
+# DATE:			  Sept 24, 2018
+#
+# DESIGNER:		Craig H. Rowland
+# PROGRAMMER:	Craig H. Rowland
+#
+# PARAMETERS: unsigned short *ptr - pointer
+                       int nbytes - number of bytes
+#
+# RETURNS:    unsigned short
+#
+# NOTES:		Uses a 32-bit accumlator to add sequential 16-bit words to it and at the end fold back
+#
+------------------------------------------------------------------------------*/
 unsigned short in_cksum(unsigned short *ptr, int nbytes){
     register long sum;
     u_short oddbyte;
@@ -414,4 +520,28 @@ unsigned short in_cksum(unsigned short *ptr, int nbytes){
     sum += (sum >> 16);
     answer = ~sum;
     return(answer);
+}
+/*------------------------------------------------------------------------------
+# SOURCE FILE: 		covert.cpp
+#
+# PROGRAM:  		COMP8505 - Assignment 1
+#
+# FUNCTIONS:  CheckRoot()
+#
+# DATE:			  Sept 24, 2018
+#
+# DESIGNER:		Benedict Lo
+# PROGRAMMER:	Benedict Lo
+#
+#
+# RETURNS:    Void
+#
+# NOTES:		Checks if the user is root
+#
+------------------------------------------------------------------------------*/
+void CheckRoot(){
+    if(geteuid() !=0){
+        printf("Application must be run as root. \n \n");
+        exit(0);
+    }
 }
