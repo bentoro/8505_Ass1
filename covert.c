@@ -82,7 +82,7 @@ bool client, server, ipid, seq, ack, tos;
 #
 # DATE:			 Sept 24, 2018
 #
-# DESIGNER:		Benedict Lo
+# DESIGNER:		    Benedict Lo
 # PROGRAMMER:		Benedict Lo
 #
 # PARAMETERS: 		int argc, char *argv[]
@@ -174,26 +174,26 @@ int main(int argc, char **argv){
    CheckRoot();
 
    if(clienttest) {
-        strcpy(dests, "127.0.0.1");
+        strcpy(dests, "192.168.1.24");
         dest = inet_addr(dests);
-        strcpy(srcs, "127.0.0.1");
+        strcpy(srcs, "192.168.1.23");
         src = inet_addr(srcs);
         strcpy(file, "secret");
-        sport = 7005;
-        dport = 7005;
+        sport = 80;
+        dport = 80;
         printf("seq: %d\n",seq);
         printf("ipid: %d\n", ipid);
         printf("tos: %d\n", tos);
         server = false;
         client = true;
    } else if(servertest){
-        strcpy(dests, "127.0.0.1");
+        strcpy(dests, "192.168.1.24");
         dest = inet_addr(dests);
-        strcpy(srcs, "127.0.0.1");
+        strcpy(srcs, "192.168.1.23");
         src = inet_addr(srcs);
         strcpy(file, "secret");
-        sport = 7005;
-        dport = 7005;
+        sport = 80;
+        dport = 80;
         printf("seq: %d\n", seq);
         printf("ipid: %d\n", ipid);
         printf("tos: %d\n", tos);
@@ -282,7 +282,7 @@ int main(int argc, char **argv){
 #
 # RETURNS:    void
 #
-# NOTES:		This receives covert packets
+# NOTES:	  This receives covert packets
 #
 ------------------------------------------------------------------------------*/
 
@@ -486,7 +486,7 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
 #
 # DATE:		Sept 24, 2018
 #
-# DESIGNER:	Craig H. Rowland
+# DESIGNER:	    Craig H. Rowland
 # PROGRAMMER:	Craig H. Rowland
 #
 # PARAMETERS: unsigned short *ptr - pointer
