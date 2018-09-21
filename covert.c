@@ -103,7 +103,8 @@ int main(int argc, char **argv){
     unsigned short sport, dport;
     server = true;
     client = false;
-
+    clienttest = false;
+    servertest = false;
     //initilize random generator
     srand((unsigned) time(&t));
 
@@ -115,16 +116,17 @@ int main(int argc, char **argv){
     }
     switch(c) {
         case 'd':
-            //dest = atoi(optarg);
             strcpy(dests, optarg);
             printf("Destination Address: %s\n", dests);
             dest = inet_addr(dests);
+            printf("dest: %i", dest);
             break;
         case 's':
             //src = atoi(optarg);
             strcpy(srcs, optarg);
             printf("Source Address: %s\n", srcs);
             src = inet_addr(srcs);
+            printf("src: %i", src);
             break;
         case 'p':
             sport = atoi(optarg);
@@ -178,12 +180,18 @@ int main(int argc, char **argv){
 
    if(clienttest) {
         strcpy(dests, "127.0.0.1");
+        printf("dests: %s\n",dests);
         dest = inet_addr(dests);
+        printf("dest: %i\n", dest);
         strcpy(srcs, "127.0.0.1");
+        printf("srcs: %s\n", srcs);
         src = inet_addr(srcs);
+        printf("src: %i\n", src);
         strcpy(file, "secret");
         sport = 80;
+        printf("sport: %u\n", sport);
         dport = 80;
+        printf("dport: %u\n", dport);
         printf("seq: %d\n",seq);
         printf("ipid: %d\n", ipid);
         printf("tos: %d\n", tos);
