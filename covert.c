@@ -175,9 +175,9 @@ int main(int argc, char **argv){
    CheckRoot();
 
    if(clienttest) {
-        strcpy(dests, "192.168.0.20");
+        strcpy(dests, "127.0.0.1");
         dest = inet_addr(dests);
-        strcpy(srcs, "192.168.0.10");
+        strcpy(srcs, "127.0.0.1");
         src = inet_addr(srcs);
         strcpy(file, "secret");
         sport = 80;
