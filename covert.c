@@ -109,18 +109,20 @@ int main(int argc, char **argv){
 
    while(1){
     int option_index = 0;
-    c = getopt_long (argc, argv, "u:y:i:q:a", long_options, &option_index);
+    c = getopt_long (argc, argv, "d:s:p:e:f:i:q:a:c:t:u:y", long_options, &option_index);
     if (c == -1){
         break;
     }
     switch(c) {
         case 'd':
-            dest = atoi(optarg);
+            //dest = atoi(optarg);
+            strcpy(dests, optarg);
             printf("Destination Address: %s\n", dests);
             dest = inet_addr(dests);
             break;
         case 's':
-            src = atoi(optarg);
+            //src = atoi(optarg);
+            strcpy(srcs, optarg);
             printf("Source Address: %s\n", srcs);
             src = inet_addr(srcs);
             break;
@@ -133,7 +135,7 @@ int main(int argc, char **argv){
             printf("Destination Port: %d\n", dport);
             break;
         case 'f':
-            strcpy(optarg, file);
+            strcpy(file, optarg);
             printf("File: %s\n", file);
             break;
         case 'i':
@@ -202,14 +204,21 @@ int main(int argc, char **argv){
         client = false;
    } else {
     if (seq == false && ipid == false && ack == false){
-        printf("No encoding was selected, defaulted to IPID encoding\n");
-        ipid = true;
+        printf("No encoding was selected\n");
+        print_usage();
+        exit(0);
    } else if(seq == true && ipid == true && ack == true){
         printf("Only one encoding type can be chosen");
+        print_usage();
+        exit(0);
    } else if(seq == true && ipid == true){
         printf("Only one encoding type can be chosen");
+        print_usage();
+        exit(0);
    } else if(ipid == true && ack == true){
         printf("Only one encoding type can be chosen");
+        print_usage();
+        exit(0);
    }
 
     if(client){
