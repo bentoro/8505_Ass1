@@ -119,14 +119,12 @@ int main(int argc, char **argv){
             strcpy(dests, optarg);
             printf("Destination Address: %s\n", dests);
             dest = inet_addr(dests);
-            printf("dest: %i", dest);
             break;
         case 's':
             //src = atoi(optarg);
             strcpy(srcs, optarg);
             printf("Source Address: %s\n", srcs);
             src = inet_addr(srcs);
-            printf("src: %i", src);
             break;
         case 'p':
             sport = atoi(optarg);
