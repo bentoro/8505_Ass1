@@ -175,9 +175,9 @@ int main(int argc, char **argv){
    CheckRoot();
 
    if(clienttest) {
-        strcpy(dests, "192.168.0.10");
+        strcpy(dests, "192.168.0.20");
         dest = inet_addr(dests);
-        strcpy(srcs, "192.168.0.27");
+        strcpy(srcs, "192.168.0.10");
         src = inet_addr(srcs);
         strcpy(file, "secret");
         sport = 80;
@@ -188,13 +188,13 @@ int main(int argc, char **argv){
         server = false;
         client = true;
    } else if(servertest){
-        strcpy(dests, "192.168.0.27");
+        strcpy(dests, "127.0.0.1");
         dest = inet_addr(dests);
-        strcpy(srcs, "192.168.0.10");
+        strcpy(srcs, "127.0.0.1");
         src = inet_addr(srcs);
         strcpy(file, "secret");
-        sport = 7005;
-        dport = 7005;
+        sport = 80;
+        dport = 80;
         printf("seq: %d\n", seq);
         printf("ipid: %d\n", ipid);
         printf("tos: %d\n", tos);
