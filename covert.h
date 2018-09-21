@@ -19,7 +19,7 @@
 #include <time.h>
 
 void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsigned short dport, char *filename, int ipid, int seq, int ack);
-void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, char *filename, int ipied, int seq, int ack);
+void RecvPacket(unsigned int src, unsigned int dst, unsigned short sport, unsigned short dport, char *filename, int ipied, int seq, int ack);
 unsigned short in_cksum(unsigned short *, int);
 void CheckRoot();
 

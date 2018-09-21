@@ -69,8 +69,9 @@ static struct option long_options[] = {
     } pseudo_header;
 
 void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsigned short dport, char *filename, int ipid, int seq, int ack);
-void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, char *filename, int ipied, int seq, int ack);
+void RecvPacket(unsigned int src, unsigned int dst, unsigned short sport, unsigned short dport, char *filename, int ipied, int seq, int ack);
 unsigned short in_cksum(unsigned short *, int);
+char dests[80], srcs[80], file[80];
 void CheckRoot();
 
 bool client, server, ipid, seq, ack, tos;
@@ -97,14 +98,18 @@ int main(int argc, char **argv){
 
     time_t t;
     int c;
-    char dests[80], srcs[80], file[80];
     bool clienttest,servertest;
     unsigned int dest, src;
     unsigned short sport, dport;
+    dests[0] = 0;
+    srcs[0] = 0;
+    file[0] = 0;
     server = true;
     client = false;
     clienttest = false;
     servertest = false;
+    sport = 0;
+    dport = 0;
     //initilize random generator
     srand((unsigned) time(&t));
 
@@ -209,10 +214,14 @@ int main(int argc, char **argv){
         server = true;
         client = false;
    } else {
-    if (seq == false && ipid == false && ack == false){
+    if (seq == false && ipid == false && ack == false && tos == false){
         printf("No encoding was selected\n");
         print_usage();
         exit(0);
+   } else if(seq == true && ipid == true && ack == true && tos == false){
+       printf("Only one encoding type can be chosen");
+       print_usage();
+       exit(0);
    } else if(seq == true && ipid == true && ack == true){
         printf("Only one encoding type can be chosen");
         print_usage();
@@ -225,6 +234,10 @@ int main(int argc, char **argv){
         printf("Only one encoding type can be chosen");
         print_usage();
         exit(0);
+   } else if(file[0] == 0){
+        printf("No file was specified\n");
+        print_usage();
+        exit(0);
    }
 
     if(client){
@@ -233,12 +246,12 @@ int main(int argc, char **argv){
             print_usage();
             exit(0);
         }
-        if(dest == 0){
+        if(dests[0] == 0){
             printf("Please select a destination address");
             print_usage();
             exit(0);
         }
-        if(src == 0){
+        if(srcs[0] == 0){
             printf("Please select a source address");
             print_usage();
             exit(0);
@@ -254,11 +267,13 @@ int main(int argc, char **argv){
         }
         printf("\nClient selected: Sending data. \n\n");
     } else {
-       if(dest == 0){
+       if(dests[0] == 0){
             strcpy(dests,"Any Host");
+            printf("Destination Address: Any Host\n");
        }
-        if(src == 0){
+        if(srcs[0] == 0){
             strcpy(srcs,"Any Host");
+            printf("Source Address: Any Host\n");
         }
         if(sport == 0){
             printf("Source Port: Any Port\n");
@@ -271,7 +286,7 @@ int main(int argc, char **argv){
     SendPacket(src, dest, sport, dport, file, ipid, seq, ack);
     } else {
     //if server receive packet
-    RecvPacket(src, sport, dport, file, ipid, seq, ack);
+    RecvPacket(src, dest, sport, dport, file, ipid, seq, ack);
     }
 
     exit(0);
@@ -302,7 +317,7 @@ int main(int argc, char **argv){
 #
 ------------------------------------------------------------------------------*/
 
-void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, char *filename, int ipid, int seq, int ack){
+void RecvPacket(unsigned int src, unsigned int dst, unsigned short sport, unsigned short dport, char *filename, int ipid, int seq, int ack){
 
     int recv_fd;
     FILE *output;
@@ -346,7 +361,7 @@ void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, ch
                         fprintf(output, "%c", recv_header.ip.tos);
                         fflush(output);
                     }
-                }
+            }
             } else {
                 if((recv_header.tcp.syn==1) && (ntohs(recv_header.tcp.dest) == sport)){
                     if(ipid==1){
@@ -366,7 +381,7 @@ void RecvPacket(unsigned int src, unsigned short sport, unsigned short dport, ch
                         fprintf(output, "%c", recv_header.ip.tos);
                         fflush(output);
                     }
-                }
+            }
             }
             //close socket
             close(recv_fd);
