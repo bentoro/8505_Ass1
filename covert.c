@@ -47,7 +47,7 @@ static struct option long_options[] = {
                     "\t[t]ype of service          - encoding using type of service \n"\
                     "");\
    }while(0)
-//
+
     struct send_header{
         struct iphdr ip;
         struct tcphdr tcp;
@@ -126,7 +126,6 @@ int main(int argc, char **argv){
             dest = inet_addr(dests);
             break;
         case 's':
-            //src = atoi(optarg);
             strcpy(srcs, optarg);
             printf("Source Address: %s\n", srcs);
             src = inet_addr(srcs);
@@ -178,7 +177,6 @@ int main(int argc, char **argv){
     }
    }
 
-   //check if server or client
    CheckRoot();
 
    if(clienttest) {
@@ -219,19 +217,19 @@ int main(int argc, char **argv){
         print_usage();
         exit(0);
    } else if(seq == true && ipid == true && ack == true && tos == false){
-       printf("Only one encoding type can be chosen");
+       printf("Only one encoding type can be chosen\n");
        print_usage();
        exit(0);
    } else if(seq == true && ipid == true && ack == true){
-        printf("Only one encoding type can be chosen");
+        printf("Only one encoding type can be chosen\n");
         print_usage();
         exit(0);
    } else if(seq == true && ipid == true){
-        printf("Only one encoding type can be chosen");
+        printf("Only one encoding type can be chosen\n");
         print_usage();
         exit(0);
    } else if(ipid == true && ack == true){
-        printf("Only one encoding type can be chosen");
+        printf("Only one encoding type can be chosen\n");
         print_usage();
         exit(0);
    } else if(file[0] == 0){
@@ -242,22 +240,22 @@ int main(int argc, char **argv){
 
     if(client){
         if(ack == 1){
-            printf("Ack encoding mode can only be used for server");
+            printf("Ack encoding mode can only be used for server\n");
             print_usage();
             exit(0);
         }
         if(dests[0] == 0){
-            printf("Please select a destination address");
+            printf("Please select a destination address\n");
             print_usage();
             exit(0);
         }
         if(srcs[0] == 0){
-            printf("Please select a source address");
+            printf("Please select a source address\n");
             print_usage();
             exit(0);
         }
         if(dport == 0){
-            printf("Please select a destination port");
+            printf("Please select a destination port\n");
             print_usage();
             exit(0);
         }
@@ -426,7 +424,6 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
             printf("File: %s could not be opened \n", filename);
         } else {
         while((ch=fgetc(input)) != EOF){
-
             //without sleep the characters are read in the wrong order
             //characters aresent too quickly for the server
             sleep(1);
@@ -452,6 +449,7 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
            send_header.ip.saddr = src;
            send_header.ip.daddr = dst;
 
+
            //fill tcp header
            send_header.tcp.source = htons(sport);
            if(seq == 0){
@@ -459,9 +457,7 @@ void SendPacket(unsigned int src, unsigned int dst, unsigned short sport, unsign
            } else {
                 send_header.tcp.seq = ch;
            }
-           //host byte order to network byte order
            send_header.tcp.dest = htons(dport);
-
            send_header.tcp.ack_seq = 0;
            send_header.tcp.res1 = 0;
            send_header.tcp.doff = 5;
